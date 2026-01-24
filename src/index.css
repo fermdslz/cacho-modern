@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@theme {
+  --color-table-green: #276638;
+  --color-table-greenDark: #1a4525;
+  --color-table-oak: #8B5E3C;
+  --color-table-oakDark: #5D4037;
+  --color-table-oakLight: #A67B5B;
+  --color-table-paper: #F9F7F1;
+  --color-table-ink: #3E2723;
+
+  --shadow-wood: 0 4px 0 #5D4037;
+  --shadow-wood-pressed: 0 1px 0 #5D4037;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-table-green);
+    color: var(--color-table-ink);
+    font-family: var(--font-sans);
+
+    /* Paño de Casino Premium */
+    background-image:
+      radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%),
+      repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 4px),
+      repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 4px);
+    background-size: 100% 100%, 8px 8px, 8px 8px;
+    background-attachment: fixed;
+    min-height: 100dvh;
+    overscroll-behavior: none;
+  }
+}
+
+@layer components {
+
+  /* Estilo Madera Roble */
+  .wood-panel {
+    @apply bg-table-oak border-4 border-table-oakDark rounded-2xl;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .paper-cell {
+    @apply bg-table-paper border border-[#dcdcdc];
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.2s ease-out;
+}
