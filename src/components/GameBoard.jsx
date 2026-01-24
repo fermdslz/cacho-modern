@@ -5,30 +5,35 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
     const currentPlayer = players[activeTab];
     const scrollContainer = React.useRef(null);
     const isDragging = React.useRef(false);
+    const dragMoved = React.useRef(false);
     const startX = React.useRef(0);
     const scrollLeft = React.useRef(0);
 
     const handleMouseDown = (e) => {
         isDragging.current = true;
+        dragMoved.current = false;
         startX.current = e.pageX - scrollContainer.current.offsetLeft;
         scrollLeft.current = scrollContainer.current.scrollLeft;
 
         scrollContainer.current.classList.add('cursor-grabbing');
         scrollContainer.current.classList.remove('cursor-grab');
 
-        // Attach global listeners
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
     };
 
     const stopDragging = () => {
-        isDragging.current = false;
+        // Delay reset slightly so children events can read the flag
+        setTimeout(() => {
+            isDragging.current = false;
+            dragMoved.current = false;
+        }, 50);
+
         if (scrollContainer.current) {
             scrollContainer.current.classList.remove('cursor-grabbing');
             scrollContainer.current.classList.add('cursor-grab');
         }
 
-        // Remove global listeners
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
     };
@@ -40,14 +45,19 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
     const handleMouseMove = (e) => {
         if (!isDragging.current) return;
 
-        // Safety check: if mouse button is not pressed (1), stop dragging
+        const x = e.pageX - scrollContainer.current.offsetLeft;
+        const dist = Math.abs(x - startX.current);
+
+        if (dist > 5) {
+            dragMoved.current = true;
+        }
+
         if ((e.buttons & 1) === 0) {
             stopDragging();
             return;
         }
 
         e.preventDefault();
-        const x = e.pageX - scrollContainer.current.offsetLeft;
         const walk = (x - startX.current) * 2;
         scrollContainer.current.scrollLeft = scrollLeft.current - walk;
     };
@@ -85,8 +95,8 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
                     <button
                         key={i}
                         onMouseUp={(e) => {
-                            // Evitar click si se estaba arrastrando
-                            if (isDragging.current) {
+                            // Solo bloquear si hubo movimiento real
+                            if (dragMoved.current) {
                                 e.stopPropagation();
                                 return;
                             }
