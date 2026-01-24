@@ -3,44 +3,53 @@
 @theme {
   --color-table-green: #276638;
   --color-table-greenDark: #1a4525;
-  --color-table-oak: #8B5E3C;
-  --color-table-oakDark: #5D4037;
-  --color-table-oakLight: #A67B5B;
-  --color-table-paper: #F9F7F1;
-  --color-table-ink: #3E2723;
+  --color-table-oak: #8b5e3c;
+  --color-table-oakDark: #5d4037;
+  --color-table-oakLight: #a67b5b;
+  --color-table-paper: #f9f7f1;
+  --color-table-ink: #3e2723;
 
-  --shadow-wood: 0 4px 0 #5D4037;
-  --shadow-wood-pressed: 0 1px 0 #5D4037;
+  --radius-2xl: 1rem;
 }
 
-@layer base {
-  body {
-    background-color: var(--color-table-green);
-    color: var(--color-table-ink);
-    font-family: var(--font-sans);
+:root {
+  --table-green: #276638;
+  --table-greenDark: #1a4525;
+  --table-oak: #8b5e3c;
+  --table-oakDark: #5d4037;
+  --table-oakLight: #a67b5b;
+  --table-paper: #f9f7f1;
+  --table-ink: #3e2723;
+}
 
-    /* Paño de Casino Premium */
-    background-image:
-      radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%),
-      repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 4px),
-      repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 4px);
-    background-size: 100% 100%, 8px 8px, 8px 8px;
-    background-attachment: fixed;
-    min-height: 100dvh;
-    overscroll-behavior: none;
-  }
+body {
+  background-color: var(--color-table-green);
+  color: var(--color-table-ink);
+  font-family: var(--font-sans);
+  overscroll-behavior: none;
+  background-image:
+    radial-gradient(circle, transparent, rgba(0, 0, 0, 0.3)),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 4px);
+  background-size: 100% 100%, 8px 8px, 8px 8px;
+  background-attachment: fixed;
+  min-height: 100dvh;
+  margin: 0;
 }
 
 @layer components {
-
-  /* Estilo Madera Roble */
   .wood-panel {
-    @apply bg-table-oak border-4 border-table-oakDark rounded-2xl;
+    border-radius: var(--radius-2xl);
+    border-width: 4px;
+    border-color: var(--color-table-oakDark);
+    background-color: var(--color-table-oak);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   }
 
   .paper-cell {
-    @apply bg-table-paper border border-[#dcdcdc];
+    background-color: var(--color-table-paper);
+    border-width: 1px;
+    border-color: #dcdcdc;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
@@ -52,8 +61,18 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Custom Shadow Utilities */
+  .shadow-wood {
+    box-shadow: 0 4px 0 var(--color-table-oakDark);
+  }
+
+  .shadow-wood-pressed {
+    box-shadow: 0 2px 0 var(--color-table-oakDark);
+  }
 }
 
+/* Animations for Modals and Effects */
 @keyframes slide-up {
   from {
     transform: translateY(100%);
@@ -67,5 +86,41 @@
 }
 
 .animate-slide-up {
-  animation: slide-up 0.2s ease-out;
+  animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pulse-gold {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 15px rgba(255, 215, 0, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+  }
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold 2s infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }

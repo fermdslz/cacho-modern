@@ -5,6 +5,7 @@ import GameBoard from './components/GameBoard';
 import WinnerScreen from './components/WinnerScreen';
 import ScoreModal from './components/ScoreModal';
 import HistoryModal from './components/HistoryModal';
+import ConfirmModal from './components/ConfirmModal';
 
 const App = () => {
   const [players, setPlayers] = useState([]);
@@ -15,6 +16,7 @@ const App = () => {
   const [modal, setModal] = useState(null);
   const [moveLog, setMoveLog] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: null, type: 'default' });
 
   // Persistence
   useEffect(() => {
@@ -57,11 +59,23 @@ const App = () => {
   const updateScore = (pos, value) => {
     // 1. Confirmación de Dormida
     if (value === 'DORMIDA') {
-      if (!confirm("⚠️ ADVERTENCIA ⚠️\n\n¿Estás SEGURO de que es una DORMIDA?\nEsto terminará la partida inmediatamente y ganará este jugador.")) {
-        return; // Cancelar si el usuario dice "Cancel"
-      }
+      setConfirmConfig({
+        isOpen: true,
+        type: 'dormida',
+        title: '¡EL SUEÑO DE TODO CACHERO!',
+        message: '¡NO PUEDE SER! 😱 ¿Es una DORMIDA REAL? ¡Confirma para hacer historia!',
+        onConfirm: () => {
+          setConfirmConfig({ isOpen: false });
+          processUpdateScore(pos, value);
+        }
+      });
+      return;
     }
 
+    processUpdateScore(pos, value);
+  };
+
+  const processUpdateScore = (pos, value) => {
     const newPlayers = [...players];
     const currentPlayer = newPlayers[activeTab];
 
@@ -93,16 +107,30 @@ const App = () => {
   };
 
   const finishGameManual = () => {
-    if (confirm("¿Terminar la partida y ver resultados?")) {
-      setGameState('finished');
-    }
+    setConfirmConfig({
+      isOpen: true,
+      title: '¿CERRAMOS LA PLANILLA?',
+      message: '¿Ya se cansaron? ¡Cerramos el cacho y vemos quién manda!',
+      type: 'default',
+      onConfirm: () => {
+        setConfirmConfig({ isOpen: false });
+        setGameState('finished');
+      }
+    });
   };
 
   const resetGameHard = () => {
-    if (confirm("¿Borrar todo y empezar nueva partida?")) {
-      localStorage.removeItem('cacho_classic_v2');
-      window.location.reload();
-    }
+    setConfirmConfig({
+      isOpen: true,
+      title: '¡BORRÓN Y CUENTA NUEVA!',
+      message: '¡Mesa limpia! ¿Quién se anima a otra partidita?',
+      type: 'default',
+      onConfirm: () => {
+        setConfirmConfig({ isOpen: false });
+        localStorage.removeItem('cacho_classic_v2');
+        window.location.reload();
+      }
+    });
   };
 
   return (
@@ -139,6 +167,15 @@ const App = () => {
         modal={modal}
         onClose={() => setModal(null)}
         onUpdateScore={updateScore}
+      />
+
+      <ConfirmModal
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        type={confirmConfig.type}
+        onConfirm={confirmConfig.onConfirm}
+        onCancel={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
       />
 
       {showHistory && (
