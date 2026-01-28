@@ -398,6 +398,7 @@ const App = () => {
       {showHistory && (
         <HistoryModal
           moveLog={moveLog}
+          onClose={() => setShowHistory(false)}
         />
       )}
       {showChangelog && (
