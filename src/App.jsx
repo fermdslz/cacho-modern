@@ -6,6 +6,11 @@ import WinnerScreen from './components/WinnerScreen';
 import ScoreModal from './components/ScoreModal';
 import HistoryModal from './components/HistoryModal';
 import ConfirmModal from './components/ConfirmModal';
+import RoomManager from './components/RoomManager';
+import { ref, onValue, set, update } from "firebase/database";
+import { db } from './firebase';
+
+const generateRoomID = () => Math.random().toString(36).substring(2, 7).toUpperCase();
 
 const App = () => {
   const [players, setPlayers] = useState([]);
@@ -17,6 +22,10 @@ const App = () => {
   const [moveLog, setMoveLog] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: null, type: 'default' });
+
+  // Room State
+  const [roomID, setRoomID] = useState(null);
+  const [role, setRole] = useState(null); // 'host' | 'spectator'
 
   // Persistence
   useEffect(() => {
@@ -35,10 +44,91 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (players.length > 0) {
+    if (players.length > 0 && !roomID) {
       localStorage.setItem('cacho_classic_v2', JSON.stringify({ players, gameState, dormidaWinner, moveLog }));
     }
-  }, [players, gameState, dormidaWinner, moveLog]);
+
+    // If we are host, sync to Firebase AND Mock
+    if (roomID && role === 'host') {
+      const data = { players, gameState, dormidaWinner, moveLog, activeTab, lastUpdated: new Date().toISOString() };
+
+      // Sync Mock (Same PC)
+      localStorage.setItem(`cacho_room_${roomID}`, JSON.stringify(data));
+
+      // Sync Firebase (Cloud)
+      try {
+        const roomRef = ref(db, `rooms/${roomID}`);
+        set(roomRef, data);
+      } catch (e) { /* Ignore dummy errors */ }
+    }
+
+    // Ensure activeTab is always valid
+    if (players.length > 0 && activeTab >= players.length) {
+      setActiveTab(0);
+    }
+  }, [players, gameState, dormidaWinner, moveLog, roomID, role, activeTab]);
+
+  // Sync logic (Firebase or Mock)
+  useEffect(() => {
+    if (roomID && role === 'spectator') {
+      console.log(`Intentando conectar a sala: ${roomID}...`);
+
+      // 1. INTENTO DE MOCK (LocalStorage) para pruebas en la misma PC
+      const syncFromLocal = () => {
+        const saved = localStorage.getItem(`cacho_room_${roomID}`);
+        if (saved) {
+          try {
+            const data = JSON.parse(saved);
+            setPlayers(data.players || []);
+            setGameState(data.gameState || 'setup');
+            setDormidaWinner(data.dormidaWinner || null);
+            setMoveLog(data.moveLog || []);
+            // REMOVED: setActiveTab synchronization for spectators 
+            // to allow independent navigation
+          } catch (e) { console.error("Error mock sync", e); }
+        }
+      };
+
+      // Poll local storage every second as fallback
+      const localInterval = setInterval(syncFromLocal, 1000);
+
+      // 2. INTENTO DE FIREBASE (Real)
+      const roomRef = ref(db, `rooms/${roomID}`);
+      const unsubscribe = onValue(roomRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          setPlayers(data.players || []);
+          setGameState(data.gameState || 'setup');
+          setDormidaWinner(data.dormidaWinner || null);
+          setMoveLog(data.moveLog || []);
+          // REMOVED: setActiveTab synchronization for spectators 
+          // to allow independent navigation
+        }
+      }, (error) => {
+        console.warn("Firebase no conectado (llaves dummy). Usando sync local.");
+      });
+
+      return () => {
+        clearInterval(localInterval);
+        unsubscribe();
+      };
+    }
+  }, [roomID, role]);
+
+  const handleHost = () => {
+    const newID = generateRoomID();
+    setRoomID(newID);
+    setRole('host');
+    // We keep current players/state if any
+  };
+
+  const handleJoin = (id) => {
+    if (!id) return;
+    setRoomID(id);
+    setRole('spectator');
+    // REMOVED: setGameState('playing'); 
+    // We wait for data to arrive before moving from 'setup'
+  };
 
   const handleStartGame = () => {
     const filteredNames = tempNames.filter(n => n.trim() !== '');
@@ -136,23 +226,53 @@ const App = () => {
   return (
     <div className="min-h-screen">
       {gameState === 'setup' && (
-        <SetupScreen
-          tempNames={tempNames}
-          setTempNames={setTempNames}
-          onStart={handleStartGame}
-        />
+        <div className="max-w-xl mx-auto px-4 py-8">
+          <RoomManager
+            onHost={handleHost}
+            onJoin={handleJoin}
+            roomID={roomID}
+            role={role}
+          />
+          <SetupScreen
+            tempNames={tempNames}
+            setTempNames={setTempNames}
+            onStart={handleStartGame}
+          />
+        </div>
       )}
 
       {gameState === 'playing' && (
-        <GameBoard
-          players={players}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          onCellClick={setModal}
-          onFinishGame={finishGameManual}
-          onResetGame={resetGameHard}
-          onOpenHistory={() => setShowHistory(true)}
-        />
+        <div className="max-w-5xl mx-auto">
+          {roomID && (
+            <div className="px-4 pt-4">
+              <RoomManager roomID={roomID} role={role} />
+            </div>
+          )}
+          {players.length > 0 ? (
+            <GameBoard
+              players={players}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              onCellClick={role === 'spectator' ? () => { } : setModal}
+              onFinishGame={finishGameManual}
+              onResetGame={resetGameHard}
+              onOpenHistory={() => setShowHistory(true)}
+              isSpectator={role === 'spectator'}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-white p-6">
+              <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+              <h2 className="text-2xl font-black text-amber-500 mb-2 uppercase tracking-tighter">Sincronizando Sala</h2>
+              <p className="text-white/60 text-center max-w-xs mb-8">Obteniendo los puntos de la nube. Si tarda mucho, verifica que el Host inició la partida.</p>
+              <button
+                onClick={() => { setRoomID(null); setRole(null); setGameState('setup'); }}
+                className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white/50 text-sm transition-all"
+              >
+                Cancelar y Salir
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
       {gameState === 'finished' && (

@@ -59,7 +59,7 @@ const SetupScreen = ({ tempNames, setTempNames, onStart }) => {
                 </div>
             </div>
             <p className="text-white/80 font-light mb-2 text-xs tracking-widest border-white/20 pt-4 mx-10 text-center">By: Fernando Machicado</p>
-            <p className="text-white/80 font-light mb-2 text-xs tracking-widest text-center">Ver. 2.0 (Vite)</p>
+            <p className="text-white/80 font-light mb-2 text-xs tracking-widest text-center">Ver. 2.1</p>
         </div>
     );
 };

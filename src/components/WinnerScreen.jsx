@@ -1,6 +1,7 @@
 import React from 'react';
 
 const WinnerScreen = ({ players, dormidaWinner, onReset }) => {
+    if (!players || players.length === 0) return null;
     const sortedPlayers = [...players].sort((a, b) => b.total - a.total);
     const winnerName = dormidaWinner || sortedPlayers[0].name;
     const title = dormidaWinner ? "¡DORMIDA!" : "RESULTADOS";
