@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SetupScreen = ({ tempNames, setTempNames, onStart }) => {
+const SetupScreen = ({ tempNames, setTempNames, onStart, onShowChangelog }) => {
 
     const addPlayer = () => setTempNames([...tempNames, '']);
 

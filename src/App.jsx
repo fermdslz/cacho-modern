@@ -7,6 +7,7 @@ import ScoreModal from './components/ScoreModal';
 import HistoryModal from './components/HistoryModal';
 import ConfirmModal from './components/ConfirmModal';
 import RoomManager from './components/RoomManager';
+import ChangelogModal from './components/ChangelogModal';
 import { ref, onValue, set, update } from "firebase/database";
 import { db } from './firebase';
 
@@ -21,6 +22,7 @@ const App = () => {
   const [modal, setModal] = useState(null);
   const [moveLog, setMoveLog] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [showChangelog, setShowChangelog] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: null, type: 'default' });
 
   // Room State
@@ -300,6 +302,7 @@ const App = () => {
               tempNames={tempNames}
               setTempNames={setTempNames}
               onStart={handleStartGame}
+              onShowChangelog={() => setShowChangelog(true)}
             />
             <div className="w-full max-w-md mx-auto">
               <RoomManager
@@ -311,7 +314,16 @@ const App = () => {
               />
               <div className="mt-8 pb-4 text-center">
                 <p className="text-white/80 font-light mb-2 text-xs tracking-widest border-t border-white/10 pt-4">By: Fernando Machicado</p>
-                <p className="text-white/80 font-light text-xs tracking-widest">Ver. 2.1</p>
+                <div className="flex items-center justify-center gap-2">
+                  <p className="text-white/80 font-light text-xs tracking-widest leading-none">Ver. 2.1</p>
+                  <button
+                    onClick={() => setShowChangelog(true)}
+                    className="w-5 h-5 flex items-center justify-center rounded-full bg-white/10 text-amber-500 hover:bg-white/20 transition-all text-[10px] font-bold border border-white/5"
+                    title="Ver novedades"
+                  >
+                    i
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -386,7 +398,12 @@ const App = () => {
       {showHistory && (
         <HistoryModal
           moveLog={moveLog}
-          onClose={() => setShowHistory(false)}
+        />
+      )}
+      {showChangelog && (
+        <ChangelogModal
+          isOpen={showChangelog}
+          onClose={() => setShowChangelog(false)}
         />
       )}
     </div>
