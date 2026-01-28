@@ -22,19 +22,28 @@
   --table-ink: #3e2723;
 }
 
+html,
 body {
   background-color: var(--color-table-green);
-  color: var(--color-table-ink);
-  font-family: var(--font-sans);
-  overscroll-behavior: none;
   background-image:
     radial-gradient(circle, transparent, rgba(0, 0, 0, 0.3)),
     repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 4px),
     repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 4px);
-  background-size: 100% 100%, 8px 8px, 8px 8px;
+  background-size: 100% 100%, 12px 12px, 12px 12px;
   background-attachment: fixed;
-  min-height: 100dvh;
+  color: var(--color-table-ink);
+  font-family: var(--font-sans);
   margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: none;
+  /* Evita el rebote de 'goma' pero permite scroll */
+  /* Asegura que el fondo cubra el notch */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 @layer components {
@@ -69,6 +78,23 @@ body {
 
   .shadow-wood-pressed {
     box-shadow: 0 2px 0 var(--color-table-oakDark);
+  }
+
+  /* Responsive Scaling Utility */
+  .responsive-scale {
+    transform-origin: top center;
+  }
+
+  @media (max-width: 380px) {
+    .responsive-scale {
+      transform: scale(0.9);
+    }
+  }
+
+  @media (max-width: 340px) {
+    .responsive-scale {
+      transform: scale(0.85);
+    }
   }
 }
 

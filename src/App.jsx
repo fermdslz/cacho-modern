@@ -24,24 +24,52 @@ const App = () => {
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: null, type: 'default' });
 
   // Room State
-  const [roomID, setRoomID] = useState(null);
-  const [role, setRole] = useState(null); // 'host' | 'spectator'
+  const [roomID, setRoomID] = useState(() => localStorage.getItem('cacho_room_id') || null);
+  const [role, setRole] = useState(() => localStorage.getItem('cacho_role') || null); // 'host' | 'spectator'
+  const [isInitializingHost, setIsInitializingHost] = useState(false);
 
   // Persistence
   useEffect(() => {
+    // 1. Recover standard game data
     const saved = localStorage.getItem('cacho_classic_v2');
     if (saved) {
       try {
         const data = JSON.parse(saved);
-        setPlayers(data.players || []);
-        setGameState(data.gameState || 'setup');
-        setDormidaWinner(data.dormidaWinner || null);
-        setMoveLog(data.moveLog || []);
-      } catch (e) {
-        console.error("Error parsing saved game", e);
-      }
+        if (!roomID) { // Only load local if not in room
+          setPlayers(data.players || []);
+          setGameState(data.gameState || 'setup');
+          setDormidaWinner(data.dormidaWinner || null);
+          setMoveLog(data.moveLog || []);
+        }
+      } catch (e) { console.error("Error parsing saved game", e); }
     }
-  }, []);
+
+    // 2. Room persistence
+    if (roomID) localStorage.setItem('cacho_room_id', roomID);
+    else localStorage.removeItem('cacho_room_id');
+
+    if (role) localStorage.setItem('cacho_role', role);
+    else localStorage.removeItem('cacho_role');
+  }, [roomID, role]);
+
+  // Handle Host Re-entry (Fecth data before syncing)
+  useEffect(() => {
+    if (roomID && role === 'host' && players.length === 0) {
+      console.log("Host re-conectando, verificando datos previos...");
+      setIsInitializingHost(true);
+      const roomRef = ref(db, `rooms/${roomID}`);
+      onValue(roomRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data && data.players && data.players.length > 0) {
+          setPlayers(data.players);
+          setGameState(data.gameState || 'playing');
+          setDormidaWinner(data.dormidaWinner || null);
+          setMoveLog(data.moveLog || []);
+        }
+        setIsInitializingHost(false);
+      }, { onlyOnce: true });
+    }
+  }, [roomID, role]);
 
   useEffect(() => {
     if (players.length > 0 && !roomID) {
@@ -49,7 +77,7 @@ const App = () => {
     }
 
     // If we are host, sync to Firebase AND Mock
-    if (roomID && role === 'host') {
+    if (roomID && role === 'host' && !isInitializingHost) {
       const data = { players, gameState, dormidaWinner, moveLog, activeTab, lastUpdated: new Date().toISOString() };
 
       // Sync Mock (Same PC)
@@ -196,6 +224,26 @@ const App = () => {
     }
   };
 
+  const handleLeaveRoom = () => {
+    setConfirmConfig({
+      isOpen: true,
+      title: '¿ABANDONAR SALA?',
+      message: role === 'host'
+        ? 'Si sales como Host, la sala dejará de actualizarse para otros. ¿Estás seguro?'
+        : 'Saldrás de esta partida y volverás al menú principal.',
+      type: 'default',
+      onConfirm: () => {
+        setConfirmConfig({ isOpen: false });
+        setRoomID(null);
+        setRole(null);
+        setGameState('setup');
+        setPlayers([]);
+        localStorage.removeItem('cacho_room_id');
+        localStorage.removeItem('cacho_role');
+      }
+    });
+  };
+
   const finishGameManual = () => {
     setConfirmConfig({
       isOpen: true,
@@ -209,69 +257,106 @@ const App = () => {
     });
   };
 
+  const handleResetApp = () => {
+    // Si hay jugadores actuales, guardamos sus nombres para la siguiente partida
+    if (players.length > 0) {
+      setTempNames(players.map(p => p.name));
+    }
+    setPlayers([]);
+    setGameState('setup');
+    setDormidaWinner(null);
+    setMoveLog([]);
+    setActiveTab(0);
+    setRoomID(null);
+    setRole(null);
+    localStorage.removeItem('cacho_classic_v2');
+    localStorage.removeItem('cacho_room_id');
+    localStorage.removeItem('cacho_role');
+  };
+
   const resetGameHard = () => {
     setConfirmConfig({
       isOpen: true,
       title: '¡BORRÓN Y CUENTA NUEVA!',
-      message: '¡Mesa limpia! ¿Quién se anima a otra partidita?',
+      message: '¿Estás seguro de reiniciar? Se perderá el progreso actual.',
       type: 'default',
       onConfirm: () => {
         setConfirmConfig({ isOpen: false });
-        localStorage.removeItem('cacho_classic_v2');
-        window.location.reload();
+        handleResetApp();
       }
     });
   };
 
+  const startNewGame = () => {
+    handleResetApp();
+  };
+
   return (
-    <div className="min-h-screen">
+    <div className="h-dvh flex flex-col overflow-hidden">
       {gameState === 'setup' && (
-        <div className="max-w-xl mx-auto px-4 py-8">
-          <RoomManager
-            onHost={handleHost}
-            onJoin={handleJoin}
-            roomID={roomID}
-            role={role}
-          />
-          <SetupScreen
-            tempNames={tempNames}
-            setTempNames={setTempNames}
-            onStart={handleStartGame}
-          />
+        <div className="flex-1 overflow-y-auto no-scrollbar pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center">
+          <div className="max-w-xl mx-auto px-4 w-full flex flex-col items-center py-4">
+            <SetupScreen
+              tempNames={tempNames}
+              setTempNames={setTempNames}
+              onStart={handleStartGame}
+            />
+            <div className="w-full max-w-md mx-auto">
+              <RoomManager
+                onHost={handleHost}
+                onJoin={handleJoin}
+                onLeave={handleLeaveRoom}
+                roomID={roomID}
+                role={role}
+              />
+              <div className="mt-8 pb-4 text-center">
+                <p className="text-white/80 font-light mb-2 text-xs tracking-widest border-t border-white/10 pt-4">By: Fernando Machicado</p>
+                <p className="text-white/80 font-light text-xs tracking-widest">Ver. 2.1</p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
       {gameState === 'playing' && (
-        <div className="max-w-5xl mx-auto">
-          {roomID && (
-            <div className="px-4 pt-4">
-              <RoomManager roomID={roomID} role={role} />
-            </div>
-          )}
-          {players.length > 0 ? (
-            <GameBoard
-              players={players}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              onCellClick={role === 'spectator' ? () => { } : setModal}
-              onFinishGame={finishGameManual}
-              onResetGame={resetGameHard}
-              onOpenHistory={() => setShowHistory(true)}
-              isSpectator={role === 'spectator'}
-            />
-          ) : (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-white p-6">
-              <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-6"></div>
-              <h2 className="text-2xl font-black text-amber-500 mb-2 uppercase tracking-tighter">Sincronizando Sala</h2>
-              <p className="text-white/60 text-center max-w-xs mb-8">Obteniendo los puntos de la nube. Si tarda mucho, verifica que el Host inició la partida.</p>
-              <button
-                onClick={() => { setRoomID(null); setRole(null); setGameState('setup'); }}
-                className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white/50 text-sm transition-all"
-              >
-                Cancelar y Salir
-              </button>
-            </div>
-          )}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto no-scrollbar pt-[env(safe-area-inset-top)]">
+            {players.length > 0 ? (
+              <>
+                {roomID && (
+                  <div className="px-4 mt-4 max-w-md mx-auto w-full text-center">
+                    <RoomManager
+                      roomID={roomID}
+                      role={role}
+                      onLeave={handleLeaveRoom}
+                    />
+                  </div>
+                )}
+                <GameBoard
+                  players={players}
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  onCellClick={role === 'spectator' ? () => { } : setModal}
+                  onFinishGame={finishGameManual}
+                  onResetGame={resetGameHard}
+                  onOpenHistory={() => setShowHistory(true)}
+                  isSpectator={role === 'spectator'}
+                />
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center min-h-[60vh] text-white p-6">
+                <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+                <h2 className="text-2xl font-black text-amber-500 mb-2 uppercase tracking-tighter">Sincronizando Sala</h2>
+                <p className="text-white/60 text-center max-w-xs mb-8">Obteniendo los puntos de la nube. Si tarda mucho, verifica que el Host inició la partida.</p>
+                <button
+                  onClick={() => { setRoomID(null); setRole(null); setGameState('setup'); }}
+                  className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white/50 text-sm transition-all"
+                >
+                  Cancelar y Salir
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -279,7 +364,7 @@ const App = () => {
         <WinnerScreen
           players={players}
           dormidaWinner={dormidaWinner}
-          onReset={resetGameHard}
+          onReset={startNewGame}
         />
       )}
 

@@ -17,7 +17,7 @@ const SetupScreen = ({ tempNames, setTempNames, onStart }) => {
     };
 
     return (
-        <div className="p-6 max-w-md mx-auto mt-10">
+        <div className="p-4 max-w-md mx-auto">
             <div className="wood-panel p-8 text-center relative">
                 {/* Clavos decorativos */}
                 <div className="absolute top-3 left-3 w-3 h-3 rounded-full bg-table-oakDark opacity-60"></div>
@@ -58,8 +58,6 @@ const SetupScreen = ({ tempNames, setTempNames, onStart }) => {
                     </button>
                 </div>
             </div>
-            <p className="text-white/80 font-light mb-2 text-xs tracking-widest border-white/20 pt-4 mx-10 text-center">By: Fernando Machicado</p>
-            <p className="text-white/80 font-light mb-2 text-xs tracking-widest text-center">Ver. 2.1</p>
         </div>
     );
 };

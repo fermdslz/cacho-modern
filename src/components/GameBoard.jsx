@@ -100,7 +100,7 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
     };
 
     return (
-        <div className="max-w-md mx-auto p-4 pb-[calc(8rem+env(safe-area-inset-bottom))]">
+        <div className="max-w-md mx-auto p-4 pb-24 responsive-scale">
 
             {/* Tabs Jugadores */}
             <div
@@ -169,9 +169,6 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
                             <>
                                 <button onClick={onFinishGame} className="bg-table-green text-white px-4 py-2 rounded shadow-wood hover:shadow-wood-pressed hover:translate-y-[2px] transition-all font-bold text-xs uppercase tracking-wide border-b border-table-greenDark">
                                     Terminar
-                                </button>
-                                <button onClick={onResetGame} className="bg-red-800 text-white p-3 rounded shadow-wood hover:shadow-wood-pressed hover:translate-y-[2px] transition-all border-b border-red-900" title="Reiniciar App">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
                                 </button>
                             </>
                         )}
