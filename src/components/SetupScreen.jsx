@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SetupScreen = ({ tempNames, setTempNames, onStart, onShowChangelog }) => {
+const SetupScreen = ({ tempNames, setTempNames, onStart, onShowChangelog, onShowSettings }) => {
 
     const addPlayer = () => setTempNames([...tempNames, '']);
 
@@ -24,6 +24,14 @@ const SetupScreen = ({ tempNames, setTempNames, onStart, onShowChangelog }) => {
                 <div className="absolute top-3 right-3 w-3 h-3 rounded-full bg-table-oakDark opacity-60"></div>
                 <div className="absolute bottom-3 left-3 w-3 h-3 rounded-full bg-table-oakDark opacity-60"></div>
                 <div className="absolute bottom-3 right-3 w-3 h-3 rounded-full bg-table-oakDark opacity-60"></div>
+
+                <button
+                    onClick={onShowSettings}
+                    className="absolute top-2 right-2 p-2 text-white/20 hover:text-white/40 transition-colors z-10"
+                    title="Ajustes"
+                >
+                    ⚙️
+                </button>
 
                 <h1 className="text-4xl font-black mb-1 text-white drop-shadow-md">CACHO</h1>
                 <p className="text-white/80 font-medium mb-8 text-sm uppercase tracking-widest border-b border-white/20 pb-4 mx-10">Siempre Unidos</p>

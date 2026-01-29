@@ -5,24 +5,24 @@ const ChangelogModal = ({ isOpen, onClose }) => {
 
     const changes = [
         {
+            title: "⚙️ Menú de Ajustes",
+            desc: "Nuevo botón de engranaje para personalizar tu experiencia de juego."
+        },
+        {
+            title: "📝 Estilos de Notación",
+            desc: "Menú desplegable para elegir entre números, estilo tradicional o modo Emoji (🖐🏼, 🥚)."
+        },
+        {
             title: "📡 Sincronización en Tiempo Real",
-            desc: "Ahora puedes crear salas (Host) y compartir el código para que otros se unan como Espectadores."
+            desc: "Crea salas (Host) y comparte el código para que otros se unan como Espectadores."
         },
         {
             title: "💾 Persistencia de Sesión",
-            desc: "La app recuerda tu sala y tus nombres aunque refresques o salgas del navegador accidentalmente."
+            desc: "La app recuerda tu sala, nombres y ajustes incluso si cierras el navegador."
         },
         {
             title: "📱 Diseño Ultra-Responsive",
-            desc: "Mejoras para iPhone (Notch support) y escalado automático para pantallas pequeñas."
-        },
-        {
-            title: "⚡ Flujo de Juego Rápido",
-            desc: "Empieza una nueva partida conservando los nombres de los jugadores automáticamente."
-        },
-        {
-            title: "🚪 Control de Sala",
-            desc: "Botón para salir de la sala con confirmación y borrar la memoria local."
+            desc: "Mejoras para iPhone y escalado automático para todas las pantallas."
         }
     ];
 
@@ -36,7 +36,7 @@ const ChangelogModal = ({ isOpen, onClose }) => {
                     ✕
                 </button>
 
-                <h2 className="text-2xl font-black text-white mb-1 uppercase tracking-tighter">Novedades Ver. 2.1</h2>
+                <h2 className="text-2xl font-black text-white mb-1 uppercase tracking-tighter">Novedades Ver. 2.2.2</h2>
                 <div className="w-12 h-1 bg-amber-500 mb-6"></div>
 
                 <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 no-scrollbar">

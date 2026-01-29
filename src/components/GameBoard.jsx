@@ -1,7 +1,7 @@
 import React from 'react';
 import { INITIAL_SCORES } from '../constants';
 
-const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame, onResetGame, onOpenHistory, isSpectator = false }) => {
+const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame, onResetGame, onOpenHistory, onOpenSettings, isSpectator = false, notationStyle = 'traditional' }) => {
 
     const currentPlayer = players[activeTab] || players[0];
 
@@ -79,21 +79,51 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
     const renderCell = (pos, label, type) => {
         const val = currentScore[pos] !== undefined ? currentScore[pos] : null;
         const isSet = val !== null;
+        const [row, col] = pos.split('-').map(Number);
+
+        // Tic-Tac-Toe style borders
+        const borderClasses = `
+            ${col < 3 ? 'border-r-2 border-table-oak/20' : ''}
+            ${row < 3 ? 'border-b-2 border-table-oak/20' : ''}
+        `;
+
         return (
             <div
                 onClick={() => !isSpectator && onCellClick({ pos, label, type })}
-                className={`h-20 rounded-lg flex flex-col items-center justify-center transition-all relative
+                className={`h-24 flex flex-col items-center justify-center transition-all relative
                     ${isSpectator ? 'cursor-default' : 'cursor-pointer'}
-                    ${isSet
-                        ? 'bg-white border-2 border-table-oak shadow-sm'
-                        : 'bg-table-paper/90 hover:bg-white border border-gray-300 shadow-inner opacity-90'
-                    }
-                    ${!isSet && isSpectator ? 'hover:bg-table-paper/90' : ''}
+                    ${borderClasses}
+                    ${isSet ? 'bg-white/40' : 'hover:bg-white/20'}
                 `}
             >
-                <span className={`text-[10px] uppercase font-bold mb-1 ${isSet ? 'text-gray-500' : 'text-gray-400'}`}>{label}</span>
+                <span className={`text-[9px] uppercase font-black mb-1 tracking-tighter ${isSet ? 'text-table-oakDark/60' : 'text-table-oakDark/30'}`}>{label}</span>
                 <span className={`text-3xl font-black ${isSet ? 'text-table-ink' : 'text-transparent'}`}>
-                    {val === null ? '-' : (val === 0 ? 'X' : val)}
+                    {val === null ? '-' : (() => {
+                        if (val === 0) return 'X';
+                        if (notationStyle === 'modern') return val;
+
+                        const isMano = [25, 35, 45].includes(val);
+                        const isHuevo = [20, 30, 40].includes(val);
+                        const isGrande = type === 'grande' && val === 50;
+
+                        if (notationStyle === 'traditional') {
+                            if (type.startsWith('major')) {
+                                if (isMano) return '$';
+                                if (isHuevo) return '0';
+                            }
+                            if (isGrande) return '$';
+                        }
+
+                        if (notationStyle === 'emoji') {
+                            if (type.startsWith('major')) {
+                                if (isMano) return '🖐🏼';
+                                if (isHuevo) return '🥚';
+                            }
+                            if (isGrande) return '$';
+                        }
+
+                        return val;
+                    })()}
                 </span>
             </div>
         );
@@ -129,8 +159,8 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
             </div>
 
             {/* Contenedor Principal */}
-            <div className={`p-3 rounded-b-xl rounded-tr-xl shadow-2xl min-h-[400px] transition-colors ${isSpectator ? 'bg-[#f0ece2]' : 'bg-[#F9F7F1]'}`}>
-                <div className="grid grid-cols-3 gap-2 mb-2">
+            <div className={`p-1 rounded-xl shadow-2xl min-h-[400px] transition-colors border-2 border-table-oak/20 ${isSpectator ? 'bg-[#f8f5ed]' : 'bg-[#F9F7F1]'}`}>
+                <div className="grid grid-cols-3 gap-0 mb-2">
                     {renderCell('1-1', 'Balas', 'num-1')}
                     {renderCell('1-2', 'Escalera', 'major-Escalera')}
                     {renderCell('1-3', 'Cuadras', 'num-4')}
@@ -144,7 +174,7 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
                     {renderCell('3-3', 'Senas', 'num-6')}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t-2 border-dashed border-gray-300">
+                <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t-2 border-table-oak/20">
                     {renderCell('4-1', '1ra Grande', 'grande')}
                     {renderCell('4-2', '2da Grande', 'grande')}
                 </div>
@@ -164,6 +194,9 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
                     <div className="flex gap-2">
                         <button onClick={onOpenHistory} className="bg-table-oakLight text-white p-3 rounded shadow-wood hover:shadow-wood-pressed hover:translate-y-[2px] transition-all border-b border-table-oak" title="Ver Historial">
                             📋
+                        </button>
+                        <button onClick={onOpenSettings} className="bg-table-oakLight text-white p-3 rounded shadow-wood hover:shadow-wood-pressed hover:translate-y-[2px] transition-all border-b border-table-oak" title="Ajustes">
+                            ⚙️
                         </button>
                         {!isSpectator && (
                             <>

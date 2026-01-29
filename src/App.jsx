@@ -8,6 +8,7 @@ import HistoryModal from './components/HistoryModal';
 import ConfirmModal from './components/ConfirmModal';
 import RoomManager from './components/RoomManager';
 import ChangelogModal from './components/ChangelogModal';
+import SettingsModal from './components/SettingsModal';
 import { ref, onValue, set, update } from "firebase/database";
 import { db } from './firebase';
 
@@ -23,7 +24,32 @@ const App = () => {
   const [moveLog, setMoveLog] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: null, type: 'default' });
+
+  // Settings
+  const [settings, setSettings] = useState(() => {
+    const saved = localStorage.getItem('cacho_settings');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        // Migration: if it was boolean from older version, convert
+        if (typeof data.useTraditionalNotation === 'boolean') {
+          return { notationStyle: data.useTraditionalNotation ? 'traditional' : 'modern' };
+        }
+        // Remove uiSize if it exists in saved settings to keep it clean
+        if (data.uiSize) delete data.uiSize;
+        return data;
+      } catch (e) { console.error("Error reading settings", e); }
+    }
+    return { notationStyle: 'traditional' };
+  });
+
+  const updateSetting = (key, value) => {
+    const newSettings = { ...settings, [key]: value };
+    setSettings(newSettings);
+    localStorage.setItem('cacho_settings', JSON.stringify(newSettings));
+  };
 
   // Room State
   const [roomID, setRoomID] = useState(() => localStorage.getItem('cacho_room_id') || null);
@@ -303,6 +329,7 @@ const App = () => {
               setTempNames={setTempNames}
               onStart={handleStartGame}
               onShowChangelog={() => setShowChangelog(true)}
+              onShowSettings={() => setShowSettings(true)}
             />
             <div className="w-full max-w-md mx-auto">
               <RoomManager
@@ -315,13 +342,20 @@ const App = () => {
               <div className="mt-8 pb-4 text-center">
                 <p className="text-white/80 font-light mb-2 text-xs tracking-widest border-t border-white/10 pt-4">By: Fernando Machicado</p>
                 <div className="flex items-center justify-center gap-2">
-                  <p className="text-white/80 font-light text-xs tracking-widest leading-none">Ver. 2.1</p>
+                  <p className="text-white/80 font-light text-xs tracking-widest leading-none">Ver. 2.2</p>
                   <button
                     onClick={() => setShowChangelog(true)}
                     className="w-5 h-5 flex items-center justify-center rounded-full bg-white/10 text-amber-500 hover:bg-white/20 transition-all text-[10px] font-bold border border-white/5"
                     title="Ver novedades"
                   >
                     i
+                  </button>
+                  <button
+                    onClick={() => setShowSettings(true)}
+                    className="w-5 h-5 flex items-center justify-center rounded-full bg-white/10 text-white/50 hover:bg-white/20 transition-all text-[10px] font-bold border border-white/5"
+                    title="Ajustes"
+                  >
+                    ⚙️
                   </button>
                 </div>
               </div>
@@ -352,7 +386,9 @@ const App = () => {
                   onFinishGame={finishGameManual}
                   onResetGame={resetGameHard}
                   onOpenHistory={() => setShowHistory(true)}
+                  onOpenSettings={() => setShowSettings(true)}
                   isSpectator={role === 'spectator'}
+                  notationStyle={settings.notationStyle}
                 />
               </>
             ) : (
@@ -407,6 +443,12 @@ const App = () => {
           onClose={() => setShowChangelog(false)}
         />
       )}
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        settings={settings}
+        onUpdateSetting={updateSetting}
+      />
     </div>
   );
 };

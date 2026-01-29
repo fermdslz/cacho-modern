@@ -24,14 +24,14 @@
 
 html,
 body {
-  background-color: var(--color-table-green);
+  background-color: var(--table-green);
   background-image:
     radial-gradient(circle, transparent, rgba(0, 0, 0, 0.3)),
     repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 4px),
     repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 4px);
   background-size: 100% 100%, 12px 12px, 12px 12px;
   background-attachment: fixed;
-  color: var(--color-table-ink);
+  color: var(--table-ink);
   font-family: var(--font-sans);
   margin: 0;
   padding: 0;
@@ -40,8 +40,6 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior-y: none;
-  /* Evita el rebote de 'goma' pero permite scroll */
-  /* Asegura que el fondo cubra el notch */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -50,9 +48,11 @@ body {
   .wood-panel {
     border-radius: var(--radius-2xl);
     border-width: 4px;
-    border-color: var(--color-table-oakDark);
-    background-color: var(--color-table-oak);
+    border-color: var(--table-oakDark);
+    background-color: var(--table-oak);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
   }
 
   .paper-cell {
@@ -80,7 +80,7 @@ body {
     box-shadow: 0 2px 0 var(--color-table-oakDark);
   }
 
-  /* Responsive Scaling Utility */
+  /* Responsive Scaling Utility (Mobile Only) */
   .responsive-scale {
     transform-origin: top center;
   }
@@ -96,57 +96,57 @@ body {
       transform: scale(0.85);
     }
   }
-}
 
-/* Animations for Modals and Effects */
-@keyframes slide-up {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
+  /* Animations for Modals and Effects */
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.animate-slide-up {
-  animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes pulse-gold {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+  .animate-slide-up {
+    animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  70% {
-    box-shadow: 0 0 0 15px rgba(255, 215, 0, 0);
+  @keyframes pulse-gold {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+    }
+
+    70% {
+      box-shadow: 0 0 0 15px rgba(255, 215, 0, 0);
+    }
+
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+    }
   }
 
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
-  }
-}
-
-.animate-pulse-gold {
-  animation: pulse-gold 2s infinite;
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0px);
+  .animate-pulse-gold {
+    animation: pulse-gold 2s infinite;
   }
 
-  50% {
-    transform: translateY(-10px);
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+
+    100% {
+      transform: translateY(0px);
+    }
   }
 
-  100% {
-    transform: translateY(0px);
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
   }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
 }
