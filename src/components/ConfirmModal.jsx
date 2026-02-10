@@ -6,8 +6,14 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, type = 'def
     const isDormida = type === 'dormida';
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
-            <div className={`wood-panel p-8 max-w-sm w-full text-center relative border-4 ${isDormida ? 'border-yellow-400' : 'border-table-oakDark'} shadow-2xl scale-in-center`}>
+        <div
+            onClick={onCancel}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300 cursor-pointer"
+        >
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className={`wood-panel p-8 max-w-sm w-full text-center relative border-4 ${isDormida ? 'border-yellow-400' : 'border-table-oakDark'} shadow-2xl scale-in-center cursor-default`}
+            >
 
                 {/* Decorative Nails */}
                 <div className="absolute top-3 left-3 w-3 h-3 rounded-full bg-black/30"></div>
@@ -31,8 +37,8 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, type = 'def
                     <button
                         onClick={onConfirm}
                         className={`w-full py-4 rounded-lg font-black text-white shadow-lg transition-all active:scale-95 ${isDormida
-                                ? 'bg-yellow-600 hover:bg-yellow-500 animate-pulse-gold border-b-4 border-yellow-800'
-                                : 'bg-table-green hover:bg-table-greenDark border-b-4 border-table-greenDark'
+                            ? 'bg-yellow-600 hover:bg-yellow-500 animate-pulse-gold border-b-4 border-yellow-800'
+                            : 'bg-table-green hover:bg-table-greenDark border-b-4 border-table-greenDark'
                             }`}
                     >
                         {isDormida ? '¡SÍ, ES DORMIDA! 🔥' : 'CONFIRMAR'}

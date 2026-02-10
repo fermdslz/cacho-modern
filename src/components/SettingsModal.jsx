@@ -4,8 +4,14 @@ const SettingsModal = ({ isOpen, onClose, settings, onUpdateSetting }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-            <div className="wood-panel max-w-sm w-full p-6 animate-slide-up relative border-2 border-white/20">
+        <div
+            onClick={onClose}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in cursor-pointer"
+        >
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="wood-panel max-w-sm w-full p-6 animate-slide-up relative border-2 border-white/20 cursor-default"
+            >
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors p-2"
@@ -30,7 +36,7 @@ const SettingsModal = ({ isOpen, onClose, settings, onUpdateSetting }) => {
                             className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white text-sm font-bold focus:outline-none focus:border-amber-500 transition-colors cursor-pointer appearance-none"
                         >
                             <option value="modern" className="bg-table-oakDark">1️⃣ Moderno (Números)</option>
-                            <option value="traditional" className="bg-table-oakDark">💵 Tradicional ($, 0)</option>
+                            <option value="traditional" className="bg-table-oakDark">💵 Tradicional ($, O)</option>
                             <option value="emoji" className="bg-table-oakDark">✋ Emoji (🖐🏼, 🥚)</option>
                         </select>
                     </div>

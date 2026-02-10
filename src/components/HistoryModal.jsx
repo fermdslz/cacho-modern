@@ -2,8 +2,14 @@ import React from 'react';
 
 const HistoryModal = ({ moveLog, onClose }) => {
     return (
-        <div className="fixed inset-0 bg-table-greenDark/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="wood-panel w-full max-w-md p-6 max-h-[80vh] flex flex-col relative">
+        <div
+            onClick={onClose}
+            className="fixed inset-0 bg-table-greenDark/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 cursor-pointer"
+        >
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="wood-panel w-full max-w-md p-6 max-h-[80vh] flex flex-col relative cursor-default"
+            >
                 <button
                     onClick={onClose}
                     className="absolute top-2 right-2 text-white/50 hover:text-white font-bold p-2"

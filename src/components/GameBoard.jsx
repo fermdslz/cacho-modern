@@ -109,7 +109,7 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
                         if (notationStyle === 'traditional') {
                             if (type.startsWith('major')) {
                                 if (isMano) return '$';
-                                if (isHuevo) return '0';
+                                if (isHuevo) return 'O';
                             }
                             if (isGrande) return '$';
                         }

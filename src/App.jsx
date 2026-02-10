@@ -18,7 +18,10 @@ const App = () => {
   const [players, setPlayers] = useState([]);
   const [gameState, setGameState] = useState('setup');
   const [dormidaWinner, setDormidaWinner] = useState(null);
-  const [tempNames, setTempNames] = useState(['', '']);
+  const [tempNames, setTempNames] = useState([
+    { id: Math.random().toString(36).substr(2, 9), name: '' },
+    { id: Math.random().toString(36).substr(2, 9), name: '' }
+  ]);
   const [activeTab, setActiveTab] = useState(0);
   const [modal, setModal] = useState(null);
   const [moveLog, setMoveLog] = useState([]);
@@ -187,11 +190,11 @@ const App = () => {
   };
 
   const handleStartGame = () => {
-    const filteredNames = tempNames.filter(n => n.trim() !== '');
+    const filteredNames = tempNames.filter(p => p.name.trim() !== '');
     if (filteredNames.length < 1) return alert("Añade al menos un jugador");
 
-    const newPlayers = filteredNames.map(name => ({
-      name,
+    const newPlayers = filteredNames.map(p => ({
+      name: p.name,
       score: { ...INITIAL_SCORES },
       total: 0
     }));
@@ -288,7 +291,12 @@ const App = () => {
   const handleResetApp = () => {
     // Si hay jugadores actuales, guardamos sus nombres para la siguiente partida
     if (players.length > 0) {
-      setTempNames(players.map(p => p.name));
+      setTempNames(players.map(p => ({ id: Math.random().toString(36).substr(2, 9), name: p.name })));
+    } else {
+      setTempNames([
+        { id: Math.random().toString(36).substr(2, 9), name: '' },
+        { id: Math.random().toString(36).substr(2, 9), name: '' }
+      ]);
     }
     setPlayers([]);
     setGameState('setup');
@@ -323,7 +331,7 @@ const App = () => {
     <div className="h-dvh flex flex-col overflow-hidden">
       {gameState === 'setup' && (
         <div className="flex-1 overflow-y-auto no-scrollbar pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center">
-          <div className="max-w-xl mx-auto px-4 w-full flex flex-col items-center py-4">
+          <div className="max-w-md mx-auto px-4 w-full flex flex-col items-center py-4">
             <SetupScreen
               tempNames={tempNames}
               setTempNames={setTempNames}
@@ -342,7 +350,7 @@ const App = () => {
               <div className="mt-8 pb-4 text-center">
                 <p className="text-white/80 font-light mb-2 text-xs tracking-widest border-t border-white/10 pt-4">By: Fernando Machicado</p>
                 <div className="flex items-center justify-center gap-2">
-                  <p className="text-white/80 font-light text-xs tracking-widest leading-none">Ver. 2.2</p>
+                  <p className="text-white/80 font-light text-xs tracking-widest leading-none">Ver. 2.3</p>
                   <button
                     onClick={() => setShowChangelog(true)}
                     className="w-5 h-5 flex items-center justify-center rounded-full bg-white/10 text-amber-500 hover:bg-white/20 transition-all text-[10px] font-bold border border-white/5"
