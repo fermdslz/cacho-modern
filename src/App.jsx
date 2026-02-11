@@ -331,7 +331,7 @@ const App = () => {
     <div className="min-h-dvh flex flex-col overflow-hidden">
       {gameState === 'setup' && (
         <div className="flex-1 overflow-y-auto no-scrollbar pb-[env(safe-area-inset-bottom)] flex flex-col justify-center">
-          <div className="max-w-md mx-auto px-4 w-full flex flex-col items-center py-4">
+          <div className="responsive-container px-4 w-full flex flex-col items-center py-4">
             <SetupScreen
               tempNames={tempNames}
               setTempNames={setTempNames}
@@ -339,7 +339,7 @@ const App = () => {
               onShowChangelog={() => setShowChangelog(true)}
               onShowSettings={() => setShowSettings(true)}
             />
-            <div className="w-full max-w-md mx-auto">
+            <div className="w-full responsive-container">
               <RoomManager
                 onHost={handleHost}
                 onJoin={handleJoin}
@@ -378,7 +378,7 @@ const App = () => {
             {players.length > 0 ? (
               <>
                 {roomID && (
-                  <div className="px-4 mt-4 max-w-md mx-auto w-full text-center">
+                  <div className="px-4 mt-4 responsive-container w-full text-center">
                     <RoomManager
                       roomID={roomID}
                       role={role}

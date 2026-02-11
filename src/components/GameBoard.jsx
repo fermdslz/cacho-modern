@@ -95,6 +95,7 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
                     ${borderClasses}
                     ${isSet ? 'bg-white/40' : 'hover:bg-white/20'}
                 `}
+                translate="no"
             >
                 <span className={`text-[9px] uppercase font-black mb-1 tracking-tighter ${isSet ? 'text-table-oakDark/60' : 'text-table-oakDark/30'}`}>{label}</span>
                 <span className={`text-3xl font-black ${isSet ? 'text-table-ink' : 'text-transparent'}`}>
@@ -130,7 +131,7 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
     };
 
     return (
-        <div className="max-w-md mx-auto p-4 pb-24 responsive-scale">
+        <div className="responsive-container p-4 pb-24 responsive-scale">
 
             {/* Tabs Jugadores */}
             <div
@@ -148,10 +149,11 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
                             }
                             setActiveTab(i);
                         }}
-                        className={`px-4 py-2 rounded-t-lg font-bold whitespace-nowrap transition-all border-t-2 border-x-2 relative
+                        className={`px-4 py-2 rounded-t-lg font-bold whitespace-nowrap transition-all border-t-2 border-x-2 relative notranslate
                             ${activeTab === i
                                 ? 'bg-[#F9F7F1] text-table-oakDark border-white shadow-lg z-10 -mb-1 pb-3'
                                 : 'bg-table-oakDark/80 text-white/70 border-table-oakDark/50 hover:bg-table-oakDark'}`}
+                        translate="no"
                     >
                         {p.name} <span className="ml-1 opacity-60 text-xs">({p.total})</span>
                     </button>
@@ -184,8 +186,8 @@ const GameBoard = ({ players, activeTab, setActiveTab, onCellClick, onFinishGame
                 className="fixed bottom-4 left-0 w-full px-4 pointer-events-none"
                 style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
             >
-                <div className="max-w-md mx-auto wood-panel p-3 flex justify-between items-center pointer-events-auto shadow-2xl border-white/10">
-                    <div>
+                <div className="responsive-container wood-panel p-3 flex justify-between items-center pointer-events-auto shadow-2xl border-white/10">
+                    <div translate="no">
                         <p className="text-[10px] font-bold text-white/60 uppercase tracking-wider">
                             {isSpectator ? `Viendo a ${currentPlayer.name}` : `Turno de ${currentPlayer.name}`}
                         </p>

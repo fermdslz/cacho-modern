@@ -8,7 +8,7 @@ const HistoryModal = ({ moveLog, onClose }) => {
         >
             <div
                 onClick={(e) => e.stopPropagation()}
-                className="wood-panel w-full max-w-md p-6 max-h-[80vh] flex flex-col relative cursor-default"
+                className="wood-panel w-full responsive-container p-6 max-h-[80vh] flex flex-col relative cursor-default"
             >
                 <button
                     onClick={onClose}

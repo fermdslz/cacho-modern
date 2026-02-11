@@ -47,6 +47,28 @@ body {
   overscroll-behavior-y: none;
 }
 
+/* Escalado de fuente para pantallas grandes y TVs */
+@media (min-width: 1920px) {
+  html {
+    font-size: 17px;
+    /* 106% del tamaño base - más sutil */
+  }
+}
+
+@media (min-width: 2560px) {
+  html {
+    font-size: 18px;
+    /* 112% del tamaño base - conservador */
+  }
+}
+
+@media (min-width: 3840px) {
+  html {
+    font-size: 20px;
+    /* 125% del tamaño base - solo para TVs 4K reales */
+  }
+}
+
 @layer components {
   .wood-panel {
     border-radius: var(--radius-2xl);
@@ -151,5 +173,46 @@ body {
 
   .animate-float {
     animation: float 3s ease-in-out infinite;
+  }
+
+  /* Anti-Translation Class */
+  .notranslate {
+    translate: no;
+  }
+
+  /* Responsive Container - Escala para pantallas grandes y TVs */
+  .responsive-container {
+    max-width: 28rem;
+    /* 448px - Móviles */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @media (min-width: 640px) {
+    .responsive-container {
+      max-width: 32rem;
+      /* 512px - Tablets (reducido) */
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .responsive-container {
+      max-width: 36rem;
+      /* 576px - Laptops (reducido) */
+    }
+  }
+
+  @media (min-width: 1920px) {
+    .responsive-container {
+      max-width: 40rem;
+      /* 640px - 2K (reducido significativamente) */
+    }
+  }
+
+  @media (min-width: 2560px) {
+    .responsive-container {
+      max-width: 48rem;
+      /* 768px - 4K/TVs (más conservador) */
+    }
   }
 }
