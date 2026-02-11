@@ -328,9 +328,9 @@ const App = () => {
   };
 
   return (
-    <div className="h-dvh flex flex-col overflow-hidden">
+    <div className="min-h-dvh flex flex-col overflow-hidden">
       {gameState === 'setup' && (
-        <div className="flex-1 overflow-y-auto no-scrollbar pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center">
+        <div className="flex-1 overflow-y-auto no-scrollbar pb-[env(safe-area-inset-bottom)] flex flex-col justify-center">
           <div className="max-w-md mx-auto px-4 w-full flex flex-col items-center py-4">
             <SetupScreen
               tempNames={tempNames}
@@ -374,7 +374,7 @@ const App = () => {
 
       {gameState === 'playing' && (
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto no-scrollbar pt-[env(safe-area-inset-top)]">
+          <div className="flex-1 overflow-y-auto no-scrollbar">
             {players.length > 0 ? (
               <>
                 {roomID && (
